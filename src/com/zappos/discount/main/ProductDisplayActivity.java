@@ -46,13 +46,15 @@ public class ProductDisplayActivity extends Activity {
 		 int productDiscountIndex = cursor.getColumnIndex(ProductListProvider.PRODUCT_DISCOUNT);
 		 int productUrlIndex = cursor.getColumnIndex(ProductListProvider.PRODUCT_URL);
 		 int thumbImageUrlIndex = cursor.getColumnIndex(ProductListProvider.THUMB_IMAGE_URL);
+		 int isFavorite = cursor.getColumnIndex(ProductListProvider.IS_FAVORITE);
 		 
 	    try {
 	        if (cursor != null && cursor.moveToFirst()) {
 	        	for (int i = 0; i < cursor.getCount(); i++){ 
-	        		
+	        		if(Integer.parseInt(cursor.getString(isFavorite))==1 )
 	        		myProducts.add(new Product(cursor.getString(productPriceIndex),cursor.getString(productUrlIndex),cursor.getString(productNameIndex),
-	        				cursor.getString(thumbImageUrlIndex),cursor.getString(productDiscountIndex),cursor.getString(productIdIndex)));
+	        				cursor.getString(thumbImageUrlIndex),cursor.getString(productDiscountIndex),cursor.getString(productIdIndex)
+	        				,Integer.parseInt(cursor.getString(isFavorite)) ));
 	                 
 	                cursor.moveToNext();
 	        }

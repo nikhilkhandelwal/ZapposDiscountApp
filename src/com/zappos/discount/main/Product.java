@@ -8,9 +8,11 @@ public class Product {
 	private String thumbnailImageUrl;
 	private String percentOff;
 	private String productId;
+	private int isFavorite;
+	
 	
 	public Product(String price, String productUrl, String productName,
-			String thumbnailImageUrl, String percentOff, String productId) {
+			String thumbnailImageUrl, String percentOff, String productId,int isFavorite) {
 		super();
 		this.price = price;
 		this.productUrl = productUrl;
@@ -18,6 +20,7 @@ public class Product {
 		this.thumbnailImageUrl = thumbnailImageUrl;
 		this.percentOff = percentOff;
 		this.productId = productId;
+		this.isFavorite = isFavorite;
 	}
 	public String getPrice() {
 		return price;
@@ -55,6 +58,12 @@ public class Product {
 	}
 	public void setProductId(String productId) {
 		this.productId = productId;
+	}
+	public int getIsFavorite() {
+		return isFavorite;
+	}
+	public void setIsFavorite(int isFavorite) {
+		this.isFavorite = isFavorite;
 	}
 	
 	

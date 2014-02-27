@@ -15,13 +15,14 @@ public class ProductListProvider extends ContentProvider {
 	public static final Uri CONTENT_URI = Uri.parse(AUTHORITY);
 	public static final String DB_NAME="product.db";
 	public static final String TABLE_NAME="product";
-	public static final int DB_VERSION=3;
+	public static final int DB_VERSION=6;
 	public static final String PRODUCT_ID= "_id";
 	public static final String PRODUCT_NAME="product_name";
 	public static final String PRODUCT_PRICE="product_price";
 	public static final String PRODUCT_DISCOUNT="product_discount";
 	public static final String PRODUCT_URL="product_url";
 	public static final String THUMB_IMAGE_URL="thumb_image_url";
+	public static final String IS_FAVORITE="is_favorite";
 	public static final String TAG= "ProductListProvider";
 	
 	DBHelper dbHelper;
@@ -44,6 +45,7 @@ public class ProductListProvider extends ContentProvider {
 		values.put(PRODUCT_DISCOUNT,product.getPercentOff());
 		values.put(PRODUCT_URL,product.getPercentOff());
 		values.put(THUMB_IMAGE_URL,product.getThumbnailImageUrl());
+		values.put(IS_FAVORITE, product.getIsFavorite());
 		
 		return values;
 	}
@@ -65,7 +67,7 @@ public class ProductListProvider extends ContentProvider {
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
 		db = dbHelper.getWritableDatabase();
-		Log.d(TAG, values.getAsString(PRODUCT_ID));
+		//Log.d(TAG, values.getAsString(PRODUCT_ID));
 		long id= db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 		if(id!=-1)
 		{
@@ -84,7 +86,7 @@ public class ProductListProvider extends ContentProvider {
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
 		db = dbHelper.getReadableDatabase();
-		Cursor cursor=db.query(ProductListProvider.TABLE_NAME, projection, selection	, selectionArgs , null, null, sortOrder);
+		Cursor cursor=db.query(ProductListProvider.TABLE_NAME, projection, selection, selectionArgs , null, null, sortOrder);
 		
 		return cursor;
 	}
@@ -93,7 +95,16 @@ public class ProductListProvider extends ContentProvider {
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
 		// TODO Auto-generated method stub
-		return 0;
+		
+		db = dbHelper.getWritableDatabase();
+		   int updateCount = 0;
+		      updateCount = db.update(ProductListProvider.TABLE_NAME, 
+		            values, 
+		            selection,
+		            selectionArgs);
+		      
+		      return updateCount;
+
 	}
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
@@ -113,9 +124,9 @@ public class ProductListProvider extends ContentProvider {
 		public void onCreate(SQLiteDatabase db) {
 			// TODO Auto-generated method stub
 			
-			String sql= String.format("create table %s "+"(%s int primary key, %s text, %s text, %s text,%s text,%s text)", ProductListProvider.TABLE_NAME, ProductListProvider.PRODUCT_ID,
+			String sql= String.format("create table %s "+"(%s int primary key, %s text, %s text, %s text,%s text,%s text, %s int)", ProductListProvider.TABLE_NAME, ProductListProvider.PRODUCT_ID,
 					ProductListProvider.PRODUCT_NAME,ProductListProvider.PRODUCT_PRICE,ProductListProvider.PRODUCT_DISCOUNT,
-					ProductListProvider.PRODUCT_URL,ProductListProvider.THUMB_IMAGE_URL);
+					ProductListProvider.PRODUCT_URL,ProductListProvider.THUMB_IMAGE_URL, ProductListProvider.IS_FAVORITE);
 			Log.d(TAG,"On create in SQl");
 			
 			db.execSQL(sql);

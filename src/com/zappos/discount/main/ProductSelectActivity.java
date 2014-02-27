@@ -7,18 +7,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,25 +28,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-/**
- * Demonstrate how to populate a complex ListView with icon and text. Icon
- * images taken from icon pack by Everaldo Coelho (http://www.everaldo.com)
- */
+
 public class ProductSelectActivity extends Activity {
 	
 
 	public static final String AUTHORITY = "content://com.zappos.discount.main.provider";
 	public static final Uri CONTENT_URI = Uri.parse(AUTHORITY);
 	private List<Product> myProducts = new ArrayList<Product>();
+	
+	public static final String TAG = "Product Selection Activity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		((ZapposDiscountApp)getApplication()).pullAndInsert();
+		Log.d(TAG,"after callin pull and insert");
 		populateProductList();
-		// populateListView();
-		registerClickCallback();
+		populateListView();
+		
 
 	}
 	@Override
@@ -65,26 +58,54 @@ public class ProductSelectActivity extends Activity {
 	}
 	
 
-	private void populateProductList() {
-
-		new LongRunningGetIO().execute();
-	}
-
-	private void registerClickCallback() {
+	private void populateListView() {
+		ArrayAdapter<Product> adapter = new MyListAdapter();
 		ListView list = (ListView) findViewById(R.id.productListView);
-		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View viewClicked,
-					int position, long id) {
-
-				Product clickedProduct = myProducts.get(position);
-				String message = "You clicked position " + position
-						+ " Which is Product make " + clickedProduct.getPrice();
-				Toast.makeText(ProductSelectActivity.this, message,
-						Toast.LENGTH_LONG).show();
-			}
-		});
+		list.setAdapter(adapter);
 	}
+	
+	private void populateProductList() {
+		Log.d(TAG,"Inside populate product list");
+		Cursor cursor = getContentResolver().query(ProductListProvider.CONTENT_URI, null, null, null, null );
+		
+		 int productIdIndex = cursor.getColumnIndex(ProductListProvider.PRODUCT_ID);
+		 int productNameIndex = cursor.getColumnIndex(ProductListProvider.PRODUCT_NAME);
+		 int productPriceIndex = cursor.getColumnIndex(ProductListProvider.PRODUCT_PRICE);
+		 int productDiscountIndex = cursor.getColumnIndex(ProductListProvider.PRODUCT_DISCOUNT);
+		 int productUrlIndex = cursor.getColumnIndex(ProductListProvider.PRODUCT_URL);
+		 int thumbImageUrlIndex = cursor.getColumnIndex(ProductListProvider.THUMB_IMAGE_URL);
+		 int isFavoriteIndex = cursor.getColumnIndex(ProductListProvider.IS_FAVORITE);
+		 
+	    try {
+	        if (cursor != null && cursor.moveToFirst()) {
+	        	for (int i = 0; i < cursor.getCount(); i++){ 
+	        		
+	        		myProducts.add(new Product(cursor.getString(productPriceIndex),cursor.getString(productUrlIndex),cursor.getString(productNameIndex),
+	        				cursor.getString(thumbImageUrlIndex),cursor.getString(productDiscountIndex),cursor.getString(productIdIndex)
+	        				,0));
+	                 
+	                cursor.moveToNext();
+	                
+	                Log.d(TAG,"populating the product list");
+	        }
+	    }
+	        else
+	        {
+	        	Log.d(TAG,"cursor is null");
+	        }
+	        } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        if (cursor != null && !cursor.isClosed()) {
+	            cursor.deactivate();
+	            cursor.close();
+	            cursor = null;
+	        }
+	    }
+		
+		
+	}
+	
 
 	private class MyListAdapter extends ArrayAdapter<Product> {
 		boolean[] switchState = new boolean[101];
@@ -121,34 +142,25 @@ public class ProductSelectActivity extends Activity {
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
 
-					int index = (Integer) v.getTag();
 					Log.v("tag of switch============", "" +position);
 					if (((ToggleButton) v).isChecked()) {
-						switchState[index] = true;
 						((ToggleButton) v)
 								.setBackgroundResource(android.R.drawable.btn_star_big_on);
-						if(myProducts.get(position)!=null)
-						getContentResolver().insert(CONTENT_URI, ProductListProvider.productToValues(myProducts.get(position) ) );
+						myProducts.get(position).setIsFavorite(1);
+						
+						getContentResolver().update(CONTENT_URI,ProductListProvider.productToValues(myProducts.get(position) ),ProductListProvider.PRODUCT_ID+"=?"
+								,new String[] {String.valueOf(myProducts.get(position).getProductId()) });
 
 					} else {
 						((ToggleButton) v)
 								.setBackgroundResource(android.R.drawable.btn_star_big_off);
-						switchState[index] = false;
+						myProducts.get(position).setIsFavorite(0);
+						getContentResolver().update(CONTENT_URI,ProductListProvider.productToValues(myProducts.get(position) ),ProductListProvider.PRODUCT_ID+"=?"
+								,new String[] {String.valueOf(myProducts.get(position).getProductId()) });
 					}
 
 				}
 			});
-
-			// deciding the state of favorite button
-			if (switchState[position])
-				holder.switchButton
-						.setBackgroundResource(android.R.drawable.btn_star_big_on);
-
-			else
-				holder.switchButton
-						.setBackgroundResource(android.R.drawable.btn_star_big_off);
-
-			holder.switchButton.setTag(Integer.valueOf(position));
 
 			// Find the Product to work with.
 			Product currentProduct = myProducts.get(position);
@@ -180,72 +192,19 @@ public class ProductSelectActivity extends Activity {
 			TextView condionText = (TextView) itemView
 					.findViewById(R.id.item_txtCondition);
 			condionText.setText(currentProduct.getPercentOff());
+			
+			ToggleButton favoriteButton = (ToggleButton) findViewById(R.id.favorite_button );
+			
+			
+			if (currentProduct.getIsFavorite()==1)
+				holder.switchButton.setBackgroundResource(android.R.drawable.btn_star_big_on);
+			else
+			 holder.switchButton.setBackgroundResource(android.R.drawable.btn_star_big_off);
 
 			return itemView;
 		}
 	}
 
-	private class LongRunningGetIO extends AsyncTask<Void, Void, String> {
-
-		private String readToEnd(InputStream input) throws IOException {
-			DataInputStream dis = new DataInputStream(input);
-			byte[] stuff = new byte[1024];
-			ByteArrayOutputStream buff = new ByteArrayOutputStream();
-			int read = 0;
-			while ((read = dis.read(stuff)) != -1) {
-				buff.write(stuff, 0, read);
-			}
-
-			return new String(buff.toByteArray());
-		}
-
-		@Override
-		protected String doInBackground(Void... params) {
-			HttpClient httpClient = new DefaultHttpClient();
-			HttpContext localContext = new BasicHttpContext();
-			HttpGet httpGet = new HttpGet(
-					"http://api.zappos.com/Search?limit=100&page=1&key=a73121520492f88dc3d33daf2103d7574f1a3166");
-
-			try {
-				HttpResponse response = httpClient.execute(httpGet,
-						localContext);
-				HttpEntity entity = response.getEntity();
-				InputStream is = entity.getContent();
-				JSONObject jsonObject = new JSONObject(readToEnd(is));
-
-				JSONArray tsmresponse = (JSONArray) jsonObject.get("results");
-
-				for (int i = 0; i < tsmresponse.length(); i++) {
-					myProducts
-							.add(new Product(tsmresponse.getJSONObject(i)
-									.getString("price"), tsmresponse
-									.getJSONObject(i).getString("productUrl"),
-									tsmresponse.getJSONObject(i).getString(
-											"productName"), tsmresponse
-											.getJSONObject(i).getString(
-													"thumbnailImageUrl"),
-									tsmresponse.getJSONObject(i).getString(
-											"percentOff"), tsmresponse
-											.getJSONObject(i).getString(
-													"productId")));
-				}
-
-			} catch (Exception e) {
-				return e.getLocalizedMessage();
-			}
-
-			return null;
-
-		}
-
-		protected void onPostExecute(String results) {
-
-			ArrayAdapter<Product> adapter = new MyListAdapter();
-			ListView list = (ListView) findViewById(R.id.productListView);
-			list.setAdapter(adapter);
-
-		}
-	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
