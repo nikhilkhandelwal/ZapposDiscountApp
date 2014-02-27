@@ -1,6 +1,6 @@
 package com.zappos.discount.main;
 
-import ca.demo.demolistview.complex.R;
+
 import android.view.View;
 import android.widget.RatingBar;
 import android.widget.ToggleButton;
