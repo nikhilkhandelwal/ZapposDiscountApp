@@ -27,39 +27,34 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class ZapposDiscountApp extends Application  {
+public class ZapposDiscountApp extends Application {
+
+	/*This class is responsible for pulling the data using the REST api and inserting in the content provider*/
 	
-	static final String TAG = "Zappos Discount App";
-	
-	static  int count=0;
-	
+	static final String TAG = "ZapposDiscountApp";
+
+
 	private List<Product> myProducts = new ArrayList<Product>();
-	
+
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		super.onCreate();
-		
-	
-	
+
 	}
-	
-	
-	public void pullAndInsert()
-	{
+
+	public void pullAndInsert() {
 		try {
 			new LongRunningGetIO().execute();
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			Log.e(TAG,"Failed to pull and insert"+e);
+			Log.e(TAG, "Failed to pull and insert" + e);
 		}
-		
-	}
-	
-	private class LongRunningGetIO extends AsyncTask<Void, Void, String> {
 
-		
+	}
+
+	private class LongRunningGetIO extends AsyncTask<Void, Void, String> {
 
 		private String readToEnd(InputStream input) throws IOException {
 			DataInputStream dis = new DataInputStream(input);
@@ -88,10 +83,7 @@ public class ZapposDiscountApp extends Application  {
 				JSONObject jsonObject = new JSONObject(readToEnd(is));
 
 				JSONArray tsmresponse = (JSONArray) jsonObject.get("results");
-				/*System.out.println(tsmresponse.getJSONObject(1)
-									.getString("price"));
-									
-*/
+
 				for (int i = 0; i < tsmresponse.length(); i++) {
 					myProducts
 							.add(new Product(tsmresponse.getJSONObject(i)
@@ -104,8 +96,7 @@ public class ZapposDiscountApp extends Application  {
 									tsmresponse.getJSONObject(i).getString(
 											"percentOff"), tsmresponse
 											.getJSONObject(i).getString(
-													"productId"),0));
-					//Log.d(TAG,"inserting first time in DB");
+													"productId"), 0)); // isFavorite boolean is initialized to 0 the first time
 				}
 
 			} catch (Exception e) {
@@ -114,22 +105,20 @@ public class ZapposDiscountApp extends Application  {
 
 			return null;
 		}
+
 		@Override
 		protected void onPostExecute(String result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			for (Product tempProduct : myProducts) {
-				//statusData.insert(status);
-				
-				getContentResolver().insert(ProductListProvider.CONTENT_URI, ProductListProvider.productToValues(tempProduct));
-				Log.d(TAG,"pull and insert " +tempProduct.getPrice());				
-				
+
+				getContentResolver().insert(ProductListProvider.CONTENT_URI,
+						ProductListProvider.productToValues(tempProduct));
+				Log.d(TAG, "pull and insert " + tempProduct.getPrice());
+
 			}
 		}
 
-		
 	}
 
-	
-	
 }

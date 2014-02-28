@@ -1,6 +1,6 @@
 package com.zappos.discount.main;
 
-
+/*Helper class to download images from the url and displaying in the Imageview*/
 import java.io.File;
 import android.content.Context;
   

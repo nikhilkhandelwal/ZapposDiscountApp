@@ -13,12 +13,12 @@
     <application
         android:name="ZapposDiscountApp"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/zapposlogo"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.zappos.discount.main.ProductSelectActivity"
-            android:label="Product List" >
+            android:label="Zappos !" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

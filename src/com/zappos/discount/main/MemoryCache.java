@@ -5,7 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import android.graphics.Bitmap;
-  
+
+/*Helper class to download images from the url and displaying in the Imageview*/
+
 public class MemoryCache {
     private Map<String, SoftReference<Bitmap>> cache=Collections.synchronizedMap(new HashMap<String, SoftReference<Bitmap>>());
   

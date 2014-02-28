@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
   
+/*Helper class to download images from the url and displaying in the Imageview*/
 public class ImageLoader {
   
     MemoryCache memoryCache=new MemoryCache();

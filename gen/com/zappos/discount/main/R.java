@@ -21,21 +21,16 @@ public final class R {
         public static final int activity_vertical_margin=0x7f040001;
     }
     public static final class drawable {
-        public static final int bug=0x7f020000;
-        public static final int down=0x7f020001;
-        public static final int fish=0x7f020002;
-        public static final int heart=0x7f020003;
-        public static final int help=0x7f020004;
-        public static final int ic_launcher=0x7f020005;
-        public static final int lightning=0x7f020006;
-        public static final int star=0x7f020007;
-        public static final int up=0x7f020008;
+        public static final int ic_launcher=0x7f020000;
+        public static final int zapposlogo=0x7f020001;
     }
     public static final class id {
-        public static final int action_settings=0x7f080006;
+        public static final int action_settings=0x7f080008;
         public static final int favorite_button=0x7f080005;
-        public static final int item_favorite_activity=0x7f080007;
+        public static final int item_favorite_activity=0x7f080009;
         public static final int item_icon=0x7f080001;
+        public static final int item_product_display=0x7f080006;
+        public static final int item_start_alarm=0x7f080007;
         public static final int item_txtCondition=0x7f080004;
         public static final int item_txtMake=0x7f080003;
         public static final int item_txtYear=0x7f080002;
@@ -46,14 +41,17 @@ public final class R {
         public static final int item_view=0x7f030001;
     }
     public static final class menu {
-        public static final int main=0x7f070000;
-        public static final int menu=0x7f070001;
+        public static final int item_product_display=0x7f070000;
+        public static final int main=0x7f070001;
+        public static final int menu=0x7f070002;
     }
     public static final class string {
         public static final int action_settings=0x7f050001;
         public static final int app_name=0x7f050000;
         public static final int favorite_activity=0x7f050003;
         public static final int hello_world=0x7f050002;
+        public static final int product_display_activity=0x7f050004;
+        public static final int start_alarm=0x7f050005;
     }
     public static final class style {
         /** 

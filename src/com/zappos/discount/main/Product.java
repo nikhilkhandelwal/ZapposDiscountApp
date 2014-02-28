@@ -1,5 +1,6 @@
 package com.zappos.discount.main;
 
+//POJO for the product details
 public class Product {
 	
 	private String price;
@@ -8,7 +9,7 @@ public class Product {
 	private String thumbnailImageUrl;
 	private String percentOff;
 	private String productId;
-	private int isFavorite;
+	private int isFavorite; // to keep the state of the favorite button
 	
 	
 	public Product(String price, String productUrl, String productName,

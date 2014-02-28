@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.util.Log;
 
+/*This class managed the content provider for the application*/
+
 public class ProductListProvider extends ContentProvider {
 	
 	public static final String AUTHORITY = "content://com.zappos.discount.main.provider";

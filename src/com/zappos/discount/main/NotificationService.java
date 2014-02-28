@@ -10,9 +10,11 @@ import android.database.Cursor;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+/*This class receives intent from boot receiver and checks if any product in the favorite list has gone on sale.*/
+ 
 public class NotificationService extends IntentService {
 
-	static final String TAG = "Notification Service";
+	static final String TAG = "NotificationService";
 	public static String N_SERVICE = "com.zappos.discount.main.N_SERVICE";
 
 	public NotificationService() {
@@ -26,9 +28,10 @@ public class NotificationService extends IntentService {
 		String ns = Context.NOTIFICATION_SERVICE;
 		int NOTIFICATION_ID = 1;
 		Log.d(TAG, "inside notification service");
-		int icon = R.drawable.bug;
+		int icon = R.drawable.zapposlogo;
 		CharSequence contentTitle = "Zappos Sale";
 		CharSequence contentText = "Some of your favorite items have gone on sale!";
+		//checking if any product has gone on sale
 		if(checkDiscountForFavorites())
 		{
 		NotificationCompat.Builder mBuilder =
@@ -53,6 +56,7 @@ public class NotificationService extends IntentService {
 		
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
 		mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+		mBuilder.setAutoCancel(true);
 		
 		}
 		stopService(intent);
@@ -61,6 +65,7 @@ public class NotificationService extends IntentService {
 	private boolean checkDiscountForFavorites() {
 		// TODO Auto-generated method stub
 		
+		// getting fresh data using the rest api
 		((ZapposDiscountApp)getApplication()).pullAndInsert();
 		Cursor cursor = getContentResolver().query(ProductListProvider.CONTENT_URI, null, null, null, null );
 		boolean toNotify=false;
@@ -71,7 +76,7 @@ public class NotificationService extends IntentService {
 	        if (cursor != null && cursor.moveToFirst()) {
 	        	for (int i = 0; i < cursor.getCount(); i++){ 
 	        		String discount = cursor.getString(productDiscountIndex).replaceAll("%", "");
-	        		Log.d(TAG,discount);
+	        		// checking if the product is in the favorite list and also if the discount is > 20% 
 	        		if(Integer.parseInt(cursor.getString(isFavorite))==1&& Integer.parseInt(discount)>=0 )
 	        			toNotify = true;
 	                cursor.moveToNext();

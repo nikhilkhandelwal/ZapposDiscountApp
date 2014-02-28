@@ -29,6 +29,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
+/*The main class which displays the whole product list pulled from Zappos.com. The use can favorite a particular product*/
 public class ProductSelectActivity extends Activity {
 	
 
@@ -36,7 +37,7 @@ public class ProductSelectActivity extends Activity {
 	public static final Uri CONTENT_URI = Uri.parse(AUTHORITY);
 	private List<Product> myProducts = new ArrayList<Product>();
 	
-	public static final String TAG = "Product Selection Activity";
+	public static final String TAG = "ProductSelectionActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -86,13 +87,9 @@ public class ProductSelectActivity extends Activity {
 	                 
 	                cursor.moveToNext();
 	                
-	                Log.d(TAG,"populating the product list");
 	        }
 	    }
-	        else
-	        {
-	        	Log.d(TAG,"cursor is null");
-	        }
+	       
 	        } catch (Exception e) {
 	        e.printStackTrace();
 	    } finally {
@@ -142,7 +139,6 @@ public class ProductSelectActivity extends Activity {
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
 
-					Log.v("tag of switch============", "" +position);
 					if (((ToggleButton) v).isChecked()) {
 						((ToggleButton) v)
 								.setBackgroundResource(android.R.drawable.btn_star_big_on);
@@ -166,10 +162,9 @@ public class ProductSelectActivity extends Activity {
 			Product currentProduct = myProducts.get(position);
 
 			// Fill the view
-			int loader = R.drawable.bug;
+			int loader = R.drawable.zapposlogo;
 			ImageView imageView = (ImageView) itemView
 					.findViewById(R.id.item_icon);
-			// imageView.setImageResource(currentProduct.getThumbnailImageUrl());
 
 			String uri = currentProduct.getThumbnailImageUrl();
 			uri = uri.replaceAll("\\\\", "");
@@ -178,24 +173,23 @@ public class ProductSelectActivity extends Activity {
 
 			imgLoader.DisplayImage(uri, loader, imageView);
 
-			// Make:
+			// Product Name:
 			TextView makeText = (TextView) itemView
 					.findViewById(R.id.item_txtMake);
 			makeText.setText("" + currentProduct.getProductName());
 
-			// Year:
+			// Product Price:
 			TextView yearText = (TextView) itemView
 					.findViewById(R.id.item_txtYear);
 			yearText.setText(currentProduct.getPrice());
 
-			// Condition:
+			// Discount:
 			TextView condionText = (TextView) itemView
 					.findViewById(R.id.item_txtCondition);
 			condionText.setText(currentProduct.getPercentOff());
 			
-			ToggleButton favoriteButton = (ToggleButton) findViewById(R.id.favorite_button );
 			
-			
+			// Setting Favorite Button image depending on the value of favorite in Db 
 			if (currentProduct.getIsFavorite()==1)
 				holder.switchButton.setBackgroundResource(android.R.drawable.btn_star_big_on);
 			else

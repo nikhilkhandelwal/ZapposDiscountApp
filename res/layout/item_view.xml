@@ -12,7 +12,7 @@
         android:adjustViewBounds="true"
         android:maxHeight="80dp"
         android:maxWidth="80dp"
-        android:src="@drawable/bug" />
+        android:src="@drawable/zapposlogo" />
 
     <TextView
         android:id="@+id/item_txtYear"
@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/item_icon"
         android:layout_alignLeft="@+id/item_txtMake"
+        android:textSize="17sp"
         android:text="Price" />
 
     <TextView
@@ -30,6 +31,7 @@
         android:layout_alignBottom="@+id/item_txtYear"
         android:layout_alignParentRight="true"
         android:text="Discount"
+        android:textSize="15sp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -37,17 +39,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        
         android:layout_toRightOf="@+id/item_icon"
+        android:layout_weight="1"
+        android:ellipsize="none"
+        android:maxLines="100"
+        android:scrollHorizontally="false"
         android:text="Product Name"
-        android:textSize="10sp" />
+        android:textSize="15sp" />
 
     <ToggleButton
         android:id="@+id/favorite_button"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="16dp" />
+        android:layout_alignBottom="@+id/item_txtMake"
+        android:layout_alignParentRight="true" />
 
 </RelativeLayout>
