@@ -82,7 +82,7 @@ public class ProductSelectActivity extends Activity {
 	        		
 	        		myProducts.add(new Product(cursor.getString(productPriceIndex),cursor.getString(productUrlIndex),cursor.getString(productNameIndex),
 	        				cursor.getString(thumbImageUrlIndex),cursor.getString(productDiscountIndex),cursor.getString(productIdIndex)
-	        				,0));
+	        				,Integer.parseInt(cursor.getString(isFavoriteIndex))));
 	                 
 	                cursor.moveToNext();
 	                
@@ -199,7 +199,7 @@ public class ProductSelectActivity extends Activity {
 			if (currentProduct.getIsFavorite()==1)
 				holder.switchButton.setBackgroundResource(android.R.drawable.btn_star_big_on);
 			else
-			 holder.switchButton.setBackgroundResource(android.R.drawable.btn_star_big_off);
+				holder.switchButton.setBackgroundResource(android.R.drawable.btn_star_big_off);
 
 			return itemView;
 		}

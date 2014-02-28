@@ -5,8 +5,8 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="17" />
+        android:minSdkVersion="16"
+        android:targetSdkVersion="19" />
     	<uses-permission android:name="android.permission.INTERNET"/>
     	 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
@@ -29,6 +29,21 @@
             android:label="Favorites List">
             
         </activity>
+        <service android:name = ".NotificationService">
+            <intent-filter>
+                <action android:name="com.zappos.discount.main.N_SERVICE" />
+
+            </intent-filter>
+        </service>
+        
+         <receiver android:name=".BootReciever">
+         <intent-filter >
+             <action android:name="com.zappos.discount.main.N_SERVICE" />
+             <action android:name="android.intent.action.TEST_RECIEVER" />
+             <action android:name="android.intent.action.BOOT_COMPLETED" />
+         </intent-filter>
+             
+         </receiver>
       <provider android:name=".ProductListProvider" android:authorities="com.zappos.discount.main.provider"></provider>
     </application>
 

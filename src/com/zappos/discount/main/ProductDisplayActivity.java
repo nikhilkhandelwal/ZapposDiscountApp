@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 public class ProductDisplayActivity extends Activity {
 	public static final String AUTHORITY = "content://com.zappos.discount.main.provider";
@@ -83,12 +84,49 @@ public class ProductDisplayActivity extends Activity {
 			// Make sure we have a view to work with (may have been given null)
 
 
+			ViewHolder holder;
+
 			View itemView = convertView;
 			if (itemView == null) {
 				itemView = getLayoutInflater().inflate(R.layout.item_view,
 						parent, false);
+				View row = itemView;
+				holder = new ViewHolder(row);
 
-			} 
+				itemView.setTag(holder);
+				holder.switchButton = (ToggleButton) itemView
+						.findViewById(R.id.favorite_button);
+
+			} else {
+				holder = (ViewHolder) itemView.getTag();
+
+			}
+			// when favorite toggle button is clicked
+
+			holder.switchButton.setOnClickListener(new View.OnClickListener() {
+
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+
+					Log.v("tag of switch============", "" +position);
+					if (((ToggleButton) v).isChecked()) {
+						((ToggleButton) v)
+								.setBackgroundResource(android.R.drawable.btn_star_big_on);
+						myProducts.get(position).setIsFavorite(1);
+						
+						getContentResolver().update(CONTENT_URI,ProductListProvider.productToValues(myProducts.get(position) ),ProductListProvider.PRODUCT_ID+"=?"
+								,new String[] {String.valueOf(myProducts.get(position).getProductId()) });
+
+					} else {
+						((ToggleButton) v)
+								.setBackgroundResource(android.R.drawable.btn_star_big_off);
+						myProducts.get(position).setIsFavorite(0);
+						getContentResolver().update(CONTENT_URI,ProductListProvider.productToValues(myProducts.get(position) ),ProductListProvider.PRODUCT_ID+"=?"
+								,new String[] {String.valueOf(myProducts.get(position).getProductId()) });
+					}
+
+				}
+			});
 
 			// Find the Product to work with.
 			Product currentProduct = myProducts.get(position);
@@ -101,7 +139,6 @@ public class ProductDisplayActivity extends Activity {
 
 			String uri = currentProduct.getThumbnailImageUrl();
 			uri = uri.replaceAll("\\\\", "");
-			Log.d(TAG, uri);
 
 			ImageLoader imgLoader = new ImageLoader(getApplicationContext());
 
@@ -121,6 +158,14 @@ public class ProductDisplayActivity extends Activity {
 			TextView condionText = (TextView) itemView
 					.findViewById(R.id.item_txtCondition);
 			condionText.setText(currentProduct.getPercentOff());
+			
+			ToggleButton favoriteButton = (ToggleButton) findViewById(R.id.favorite_button );
+			
+			
+			if (currentProduct.getIsFavorite()==1)
+				holder.switchButton.setBackgroundResource(android.R.drawable.btn_star_big_on);
+			else
+				holder.switchButton.setBackgroundResource(android.R.drawable.btn_star_big_off);
 
 			return itemView;
 		}
