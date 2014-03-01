@@ -273,7 +273,8 @@ public class ProductSelectActivity extends Activity {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpContext localContext = new BasicHttpContext();
 			HttpGet httpGet = new HttpGet(
-					"http://www.json-generator.com/j/bLIhBbYKbm?indent=4");
+					"http://api.zappos.com/Search?limit=100&page=1&key=a73121520492f88dc3d33daf2103d7574f1a3166");
+			//http://www.json-generator.com/j/coSmjZAKuW?indent=4 the url used for testing as the above url was generally down
 
 			try {
 				HttpResponse response = httpClient.execute(httpGet,
