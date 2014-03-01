@@ -3,4 +3,5 @@
     
  <item android:id="@+id/item_product_display" android:title="@string/product_display_activity"></item>
  <item android:id="@+id/item_start_alarm" android:title="@string/start_alarm"></item>
+ <item android:id="@+id/item_stop_alarm" android:title="@string/stop_alarm"></item>
 </menu>

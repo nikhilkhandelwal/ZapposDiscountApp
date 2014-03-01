@@ -27,6 +27,7 @@ public class ProductDisplayActivity extends Activity {
 
 	public static final String AUTHORITY = "content://com.zappos.discount.main.provider";
 	public static final Uri CONTENT_URI = Uri.parse(AUTHORITY);
+	public static String B_SERVICE = "com.zappos.discount.main.B_SERVICE";
 	
 	public static final String TAG= "FavoriteDisplayActivity";
 	private List<Product> myProducts = new ArrayList<Product>();
@@ -68,6 +69,7 @@ public class ProductDisplayActivity extends Activity {
 	    try {
 	        if (cursor != null && cursor.moveToFirst()) {
 	        	for (int i = 0; i < cursor.getCount(); i++){ 
+	        		//populating favorite list
 	        		if(Integer.parseInt(cursor.getString(isFavorite))==1 ) // only populating the items which have isFavorite flag = 1
 	        		myProducts.add(new Product(cursor.getString(productPriceIndex),cursor.getString(productUrlIndex),cursor.getString(productNameIndex),
 	        				cursor.getString(thumbImageUrlIndex),cursor.getString(productDiscountIndex),cursor.getString(productIdIndex)
@@ -196,7 +198,19 @@ public class ProductDisplayActivity extends Activity {
 			startActivity(intentProductList);
 			return true;
 		
+		case R.id.item_start_alarm :
 			
+			Intent startIntent = new Intent(ProductDisplayActivity.B_SERVICE);
+			startIntent.putExtra("extra", "start");
+			sendBroadcast(startIntent);
+			return true;
+		
+		case R.id.item_stop_alarm :
+			
+			Intent stopIntent = new Intent(ProductDisplayActivity.B_SERVICE);
+			stopIntent.putExtra("extra", "stop");
+			sendBroadcast(stopIntent);
+			return true;
 			default:
 				
 				return false;

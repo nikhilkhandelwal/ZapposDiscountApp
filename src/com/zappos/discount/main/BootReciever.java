@@ -15,14 +15,25 @@ public class BootReciever extends BroadcastReceiver {
 	at the interval. The interval is har coded to 5 minutes. It can the canged by setting the interval variable
 */
 	@Override
-	public void onReceive(Context context, Intent arg1) {
+	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
-		long interval = Long.parseLong("300000"); // 5 minute to call notification service
+		String state = intent.getExtras().getString("extra");
+		AlarmManager alarmManager = (AlarmManager) context.getSystemService(context.ALARM_SERVICE);
 		PendingIntent operation = PendingIntent.getService(context, -1, new Intent(NotificationService.N_SERVICE ), PendingIntent.FLAG_UPDATE_CURRENT);
-		AlarmManager alaramManager = (AlarmManager) context.getSystemService(context.ALARM_SERVICE);
-		alaramManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(),interval, operation);
+		if(state.equalsIgnoreCase("start"))
+		{
+		long interval = Long.parseLong("30000"); // 5 minute to call notification service
 		
-		Log.d("BootReciever", "On recieve: delay "+interval);
+		
+		alarmManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(),interval, operation);
+		Log.d("BootReciever", "Alaram set with interval : "+interval);
+		}
+		else
+		{
+			alarmManager.cancel(operation);
+			Log.d("BootReciever", "Alaram cancelled ");
+		}
+		
 		
 	}
 

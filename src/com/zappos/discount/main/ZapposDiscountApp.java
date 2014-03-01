@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -17,15 +18,15 @@ import org.apache.http.protocol.HttpContext;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.zappos.discount.main.ProductListProvider.DBHelper;
+
 import android.app.Application;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.app.ProgressDialog;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 public class ZapposDiscountApp extends Application {
 
@@ -34,7 +35,7 @@ public class ZapposDiscountApp extends Application {
 	static final String TAG = "ZapposDiscountApp";
 
 
-	private List<Product> myProducts = new ArrayList<Product>();
+	private List<Product> myProducts ;
 
 	@Override
 	public void onCreate() {
@@ -56,6 +57,7 @@ public class ZapposDiscountApp extends Application {
 
 	private class LongRunningGetIO extends AsyncTask<Void, Void, String> {
 
+		private ProgressDialog progressDialog;
 		private String readToEnd(InputStream input) throws IOException {
 			DataInputStream dis = new DataInputStream(input);
 			byte[] stuff = new byte[1024];
@@ -72,8 +74,10 @@ public class ZapposDiscountApp extends Application {
 		protected String doInBackground(Void... params) {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpContext localContext = new BasicHttpContext();
+			
 			HttpGet httpGet = new HttpGet(
-					"http://api.zappos.com/Search?limit=100&page=1&key=a73121520492f88dc3d33daf2103d7574f1a3166");
+					"http://www.json-generator.com/j/coSmjZAKuW?indent=4");
+			
 
 			try {
 				HttpResponse response = httpClient.execute(httpGet,
@@ -83,8 +87,9 @@ public class ZapposDiscountApp extends Application {
 				JSONObject jsonObject = new JSONObject(readToEnd(is));
 
 				JSONArray tsmresponse = (JSONArray) jsonObject.get("results");
-
+				myProducts = new ArrayList<Product>();
 				for (int i = 0; i < tsmresponse.length(); i++) {
+					
 					myProducts
 							.add(new Product(tsmresponse.getJSONObject(i)
 									.getString("price"), tsmresponse
@@ -98,11 +103,48 @@ public class ZapposDiscountApp extends Application {
 											.getJSONObject(i).getString(
 													"productId"), 0)); // isFavorite boolean is initialized to 0 the first time
 				}
+				Iterator<Product> iterator = myProducts.iterator();
+				while(iterator.hasNext()){
+					
+					Product tempProduct = iterator.next();
+					String [] temp = {tempProduct.getProductId()};
+					Cursor c = getContentResolver().query(ProductListProvider.CONTENT_URI, null, "_id=?", temp, null);
+					// to update the state of favorite button from the pre existing state
+					//i.i if product_id exists and the isFavorite == 1 then update the db else insert
+					try {
+						
+						int isFavoriteIndex = c.getColumnIndex(ProductListProvider.IS_FAVORITE);
+						if(c.moveToFirst() && Integer.parseInt(c.getString(isFavoriteIndex)) ==1)
+						{
+							tempProduct.setIsFavorite(1);
+							
+							getContentResolver().update(ProductListProvider.CONTENT_URI,ProductListProvider.productToValues(tempProduct ),ProductListProvider.PRODUCT_ID+"=?"
+									,new String[] {String.valueOf(tempProduct.getProductId()) });
+						}
+						else
+						{
+							getContentResolver().insert(ProductListProvider.CONTENT_URI,
+									ProductListProvider.productToValues(tempProduct));
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						
+					}
+					finally{
+						if ( c != null && !c.isClosed()) {
+				            c.deactivate();
+				            c.close();
+				            c = null;
+				        }
+					}
+				}
 
 			} catch (Exception e) {
 				return e.getLocalizedMessage();
 			}
 
+		
 			return null;
 		}
 
@@ -110,15 +152,12 @@ public class ZapposDiscountApp extends Application {
 		protected void onPostExecute(String result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			for (Product tempProduct : myProducts) {
-
-				getContentResolver().insert(ProductListProvider.CONTENT_URI,
-						ProductListProvider.productToValues(tempProduct));
-				Log.d(TAG, "pull and insert " + tempProduct.getPrice());
-
-			}
+			
 		}
+		
+		
 
 	}
+	
 
 }
